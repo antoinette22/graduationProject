@@ -1,5 +1,6 @@
 ﻿
 
+using graduationProject.core.Dtos;
 using graduationProject.DTOs;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,11 @@ namespace graduationProject.Services
     {
         //  Task<ResultDto> UpdateNameAsync(string email, UpdateNameDto dto);
         Task<ResultDto> UpdateEmailAsync(string userName, string newEmail);
-      //  Task UpdatePasswordAsync(string email, UpdatePasswordDto dto);
+        //  Task UpdatePasswordAsync(string email, UpdatePasswordDto dto);
+        Task<ResultDto> forgetPasswordAsync(string email);
+        Task<ResultDto> ResetPasswordAsync(resetPasswordDto model);
+        Task<ResetTokenDto> VerifyCodeAsync(verifyCodeDto codeDto);
+
 
 
     }
