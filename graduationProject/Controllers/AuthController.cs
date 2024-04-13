@@ -337,6 +337,58 @@ namespace graduationProject.Controllers
             return Ok(result);
         }
 
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("add Rate")]
+        public async Task<IActionResult> RatingUserAsync([FromBody]userRatingDto userRating)
+        {
+
+            var user = await _userManager.FindByIdAsync(userRating.UserId);
+            if (user != null)
+            {
+                if (userRating.ratingValue < 1 || userRating.ratingValue > 5)
+                {
+                    return BadRequest("rating value must bs bwtween 1 and 5 ");
+                }
+                var Rating = new UserRating
+                {
+                    Rate = userRating.ratingValue,
+                    UserId = userRating.UserId
+                };
+                _context.userRating.AddAsync(Rating);
+                await _context.SaveChangesAsync();
+                return Ok("rate value saved successfully");
+
+            }
+            return BadRequest("user not fiund");
+        }
+        [Authorize]
+        [HttpGet]
+        [Route("view Rate")]
+        public async Task<IActionResult> getUserRate(string userId)
+        {
+            try
+            {
+                var userRating = await _context.userRating
+                    .Where( r=> r.UserId == userId)
+                    .Select ( r => r.Rate)
+                    .ToListAsync();
+                if (userRating == null || !userRating.Any())
+                    return Ok(0);
+                double averageRating = userRating.Average();
+                return Ok(averageRating);
+            }
+            
+
+           
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 
 }

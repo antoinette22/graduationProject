@@ -12,5 +12,6 @@ namespace graduationProject.core.DbContext
             
         }
         public DbSet<verificationCode> verificationCodes { get; set; }
+        public DbSet<UserRating> userRating { get; set; }
     }
 }

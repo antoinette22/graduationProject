@@ -193,30 +193,7 @@ namespace graduationProject.Services
 
 
         }
-        //public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
-        //{
-        //    // Check if the reset code is valid and not expired
-        //    var resetCode = await _context.ResetCodes.FirstOrDefaultAsync(rc => rc.UserId == model.UserId && rc.Code == model.Code && rc.ExpiryDate > DateTime.UtcNow);
-        //    if (resetCode == null)
-        //    {
-        //        return BadRequest("Invalid or expired reset code.");
-        //    }
-
-        //    // Reset the user's password
-        //    var user = await _userManager.FindByIdAsync(model.UserId);
-        //    var resetPasswordResult = await _userManager.ResetPasswordAsync(user, resetCode.Code, model.NewPassword);
-        //    if (resetPasswordResult.Succeeded)
-        //    {
-        //        // Remove the reset code from the database
-        //        _context.ResetCodes.Remove(resetCode);
-        //        await _context.SaveChangesAsync();
-        //        return Ok("Password reset successfully.");
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("Failed to reset password.");
-        //    }
-        //}
+       
         public async Task<ResetTokenDto> VerifyCodeAsync(verifyCodeDto codeDto)
         {
             var user = await _userManager.FindByEmailAsync(codeDto.Email);
