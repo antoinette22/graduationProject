@@ -8,9 +8,9 @@ namespace graduationProject.Services
 {
     public class RoleService : IRoleService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        public RoleService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
+        public RoleService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<int>> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -43,7 +43,7 @@ namespace graduationProject.Services
                 ErrorMessage = string.Empty,
                 Roles = roles.Select(r => new RoleModel
                 {
-                    Id = r.Id,
+                    Id = r.Id.ToString(),
                     Name = r.Name,
                     IsSelected = _userManager.IsInRoleAsync(user, r.Name).Result
                 })
@@ -63,11 +63,11 @@ namespace graduationProject.Services
             var roles = await _roleManager.Roles.ToListAsync();
 
             userRolesdto.ErrorMessage = string.Empty;
-            userRolesdto.Id = user.Id;
+            userRolesdto.Id = user.Id.ToString();
             userRolesdto.UserName = user.UserName;
             userRolesdto.Roles = roles.Select(r => new RoleModel
             {
-                Id = r.Id,
+                Id = r.Id.ToString(),
                 Name = r.Name,
                 IsSelected = _userManager.IsInRoleAsync(user, r.Name).Result
             });
@@ -80,7 +80,7 @@ namespace graduationProject.Services
 
             var userViewModels = users.Select(user => new UserViewDto
             {
-                Id = user.Id,
+                Id = user.Id.ToString(),
                 UserName = user.UserName,
                 Email = user.Email,
                 Roles = _userManager.GetRolesAsync(user).Result

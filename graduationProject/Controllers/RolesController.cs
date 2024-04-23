@@ -1,4 +1,5 @@
 ﻿using graduationProject.DTOs;
+using graduationProject.Models;
 using graduationProject.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,9 +12,9 @@ namespace graduationProject.Controllers
     public class RolesController : ControllerBase
     {
         private readonly IRoleService _roleService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RolesController(IRoleService roleService, UserManager<IdentityUser> userManager)
+        public RolesController(IRoleService roleService, UserManager<ApplicationUser> userManager)
         {
             _roleService = roleService;
             _userManager = userManager;

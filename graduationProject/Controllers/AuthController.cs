@@ -23,13 +23,14 @@ namespace graduationProject.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _context;
         private readonly IAuthService _authService;
         private readonly IUserProfileService _userProfileService;
-        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ApplicationDbContext context, IAuthService authService, IUserProfileService userProfileService)
+        private readonly IuserService _userservice;
+        public AuthController(UserManager<ApplicationUser> userManager, IuserService userService, RoleManager<IdentityRole<int>> roleManager, IConfiguration configuration, ApplicationDbContext context, IAuthService authService, IUserProfileService userProfileService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -37,6 +38,7 @@ namespace graduationProject.Controllers
             _context = context;
             _authService = authService;
             _userProfileService = userProfileService;
+            _userservice = userService;
         }
         //seed roles
         /* [HttpPost]
@@ -124,7 +126,7 @@ namespace graduationProject.Controllers
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,user.UserName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim("JWTID",Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Email,user.Email)  
             };
@@ -345,7 +347,7 @@ namespace graduationProject.Controllers
         public async Task<IActionResult> RatingUserAsync([FromBody]userRatingDto userRating)
         {
 
-            var user = await _userManager.FindByIdAsync(userRating.UserId);
+            var user = await _userManager.FindByIdAsync(userRating.UserId.ToString());
             if (user != null)
             {
                 if (userRating.ratingValue < 1 || userRating.ratingValue > 5)
@@ -362,12 +364,12 @@ namespace graduationProject.Controllers
                 return Ok("rate value saved successfully");
 
             }
-            return BadRequest("user not fiund");
+            return BadRequest("user not found");
         }
         [Authorize]
         [HttpGet]
         [Route("view Rate")]
-        public async Task<IActionResult> getUserRate(string userId)
+        public async Task<IActionResult> getUserRate(int userId)
         {
             try
             {
@@ -387,6 +389,15 @@ namespace graduationProject.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+        //[Authorize]
+        [HttpGet("serch users")]
+        
+        public async Task<IActionResult> SearchUsers(string userName)
+
+        {
+            var result = await _userservice.SearchUserProfile(userName);
+            return Ok(result);
         }
 
     }

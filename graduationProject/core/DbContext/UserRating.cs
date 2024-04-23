@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using graduationProject.Models;
 
 namespace graduationProject.core.DbContext
 {
@@ -10,8 +11,8 @@ namespace graduationProject.core.DbContext
         public int Id { get; set; }
         [Required]
         public int Rate { get; set; }
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         [ForeignKey("UserId")]
-        public IdentityUser User { get; set; }
+        public ApplicationUser User { get; set; }
     }
 }

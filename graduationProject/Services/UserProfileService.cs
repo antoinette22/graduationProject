@@ -27,14 +27,14 @@ namespace graduationProject.Services
     {
         //private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthService _authService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMailingService _mailingService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
         private readonly ApplicationDbContext _context;
 
-        public UserProfileService(IAuthService authService, IMailingService mailingService, ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory, UserManager<IdentityUser> userManager)
+        public UserProfileService(IAuthService authService, IMailingService mailingService, ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory, UserManager<ApplicationUser> userManager)
         {
 
             _authService = authService;
@@ -139,15 +139,15 @@ namespace graduationProject.Services
             var result = await _mailingService.SendEmailAsync(user.Email, "Password Reset Code ", message, null);
             if (result)
             {
-                var Vcode =new verificationCode
+                var Vcode =new ApplicationUser
                 {
                     Code = randomNum,
-                    UserId = user.Id,
                     CreatedAt = DateTime.UtcNow,
                     ExpiresAt = DateTime.UtcNow.AddMinutes(10),
                 };
                
-               _context.verificationCodes.AddAsync(Vcode);
+              // _context.applicationUsers.AddAsync(Vcode);
+              _userManager.UpdateAsync(Vcode);
                await _context.SaveChangesAsync();
                 
                 return new ResultDto
@@ -205,12 +205,13 @@ namespace graduationProject.Services
                     Message = "Email is incorrect or not found"
                 };
             };
-            var result = await _context.verificationCodes.FirstOrDefaultAsync(c=> c.UserId==user.Id && c.Code==codeDto.Code);/*(c => c.UserId == user.Id && c.Code == codeDto.Code);*/
+            //var result = await _context.applicationUsers.FirstOrDefaultAsync(c=> c.Code==codeDto.Code);/*(c => c.UserId == user.Id && c.Code == codeDto.Code);*/
 
-
-            if (result != null && !result.IsEpired)
+            var result = user.Code == codeDto.Code;
+            if (result != null && !user.IsEpired)
             {
-               _context.verificationCodes.Remove(result);
+              // _context.applicationUsers.Remove(result);
+              _userManager.UpdateAsync(user);
                 await _context.SaveChangesAsync();
 
                 var restToken = await _userManager.GeneratePasswordResetTokenAsync(user);

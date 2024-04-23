@@ -1,4 +1,5 @@
-﻿using graduationProject.core.Dtos;
+﻿using graduationProject.core.DbContext;
+using graduationProject.core.Dtos;
 using graduationProject.DTOs;
 using graduationProject.Models;
 using Microsoft.AspNetCore.Identity;
@@ -15,15 +16,16 @@ namespace graduationProject.Services
 {
     public class AuthService:IAuthService
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         //private readonly JWT _jwt;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly IMailingService _mailingService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IActionContextAccessor _actionContextAccessor;
         private readonly IUrlHelperFactory _urlHelperFactory;
+        private readonly ApplicationDbContext _context;
 
-        public AuthService(UserManager<IdentityUser> userManager,/* IOptions<JWT> jwt, */RoleManager<IdentityRole> roleManager, IMailingService mailingService, IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
+        public AuthService(UserManager<ApplicationUser> userManager,ApplicationDbContext context,/* IOptions<JWT> jwt, */RoleManager<IdentityRole<int>> roleManager, IMailingService mailingService, IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor, IUrlHelperFactory urlHelperFactory)
         {
             _userManager = userManager;
           //  _jwt = jwt.Value;
@@ -32,6 +34,7 @@ namespace graduationProject.Services
             _httpContextAccessor = httpContextAccessor;
             _actionContextAccessor = actionContextAccessor;
             _urlHelperFactory = urlHelperFactory;
+            _context= context;
         }
 
         public async Task<RegisterResultDto> RegisterAsync(RegisterModel model)
@@ -40,15 +43,17 @@ namespace graduationProject.Services
                 return new RegisterResultDto { Message = "The Email Is Already Registered" };
             if (await _userManager.FindByNameAsync(model.UserName) is not null)
                 return new RegisterResultDto { Message = "The UserName Is Already Registerd" };
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = model.UserName,
                 Email = model.Email,
+
              //   FirstName = model.FirstName,
                // LastName = model.LastName,
-                EmailConfirmed = false
+                EmailConfirmed = true
             };
             var result = await _userManager.CreateAsync(user, model.Password);
+            _context.SaveChanges();
             if (!result.Succeeded)
             {
                 var errors = string.Empty;
@@ -58,6 +63,18 @@ namespace graduationProject.Services
                 }
                 return new RegisterResultDto { Message = errors };
             }
+
+            var User = new Users()
+            {
+                Name = model.UserName,
+                UserId = user.Id,
+                
+            };
+            _context.users.Add(User);
+            _context.SaveChanges();
+            
+
+
             if (model.IsInvestor)
                 await _userManager.AddToRoleAsync(user, "Investor");
             else
