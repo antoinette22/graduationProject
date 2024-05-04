@@ -12,5 +12,7 @@ namespace graduationProject.core.DbContext
         public string Name { get; set; }
         public int UserId { get; set; }
         public ApplicationUser User { get; set; }
+        public IEnumerable<Post> Posts { get; set; }
+
     }
 }

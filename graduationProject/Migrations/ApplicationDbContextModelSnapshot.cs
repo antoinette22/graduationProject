@@ -163,16 +163,26 @@ namespace graduationProject.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Image")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OfferContent")
+                    b.Property<string>("NationalId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
+
+                    b.Property<double>("ProfitRate")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Rrice")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -454,7 +464,7 @@ namespace graduationProject.Migrations
             modelBuilder.Entity("graduationProject.DTOs.offers.offer", b =>
                 {
                     b.HasOne("graduationProject.Models.Post", "Post")
-                        .WithMany()
+                        .WithMany("offers")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -475,8 +485,8 @@ namespace graduationProject.Migrations
 
             modelBuilder.Entity("graduationProject.Models.Post", b =>
                 {
-                    b.HasOne("graduationProject.Models.ApplicationUser", "User")
-                        .WithMany()
+                    b.HasOne("graduationProject.core.DbContext.Users", "User")
+                        .WithMany("Posts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -552,6 +562,13 @@ namespace graduationProject.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Reacts");
+
+                    b.Navigation("offers");
+                });
+
+            modelBuilder.Entity("graduationProject.core.DbContext.Users", b =>
+                {
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

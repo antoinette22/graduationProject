@@ -12,8 +12,8 @@ using graduationProject.core.DbContext;
 namespace graduationProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240423172725_rr")]
-    partial class rr
+    [Migration("20240504115912_initt")]
+    partial class initt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,6 +156,42 @@ namespace graduationProject.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("graduationProject.DTOs.offers.offer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NationalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ProfitRate")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Rrice")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("Offers");
                 });
 
             modelBuilder.Entity("graduationProject.Models.ApplicationUser", b =>
@@ -428,6 +464,17 @@ namespace graduationProject.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("graduationProject.DTOs.offers.offer", b =>
+                {
+                    b.HasOne("graduationProject.Models.Post", "Post")
+                        .WithMany("offers")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("graduationProject.Models.Comment", b =>
                 {
                     b.HasOne("graduationProject.Models.Post", "Post")
@@ -441,8 +488,8 @@ namespace graduationProject.Migrations
 
             modelBuilder.Entity("graduationProject.Models.Post", b =>
                 {
-                    b.HasOne("graduationProject.Models.ApplicationUser", "User")
-                        .WithMany()
+                    b.HasOne("graduationProject.core.DbContext.Users", "User")
+                        .WithMany("Posts")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -518,6 +565,13 @@ namespace graduationProject.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Reacts");
+
+                    b.Navigation("offers");
+                });
+
+            modelBuilder.Entity("graduationProject.core.DbContext.Users", b =>
+                {
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

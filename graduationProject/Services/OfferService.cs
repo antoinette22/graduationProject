@@ -16,20 +16,20 @@ namespace graduationProject.Services
             _context = context;
             _uploadsPath = Path.Combine(env.WebRootPath, "cardId");
         }
-        public async Task<ResultDto> sendOfferToPost(int postId , string offerContent , IFormFile image )
+        public async Task<ResultDto> sendOfferToPost(offerDto Offer)
         {
-            var post = await _context.Posts.FindAsync(postId);
+            var post = await _context.Posts.FindAsync(Offer.postId);
             if (post == null)
             {
                 return new ResultDto()
                 {
                     IsSuccess = false,
-                    Message= "post not found"
+                    Message = "post not found"
                 };
             }
-            if (image!= null)
+            if (Offer.Image != null)
             {
-                var extension = Path.GetExtension(image.FileName);
+                var extension = Path.GetExtension(Offer.Image.FileName);
                 if (!_allowedExtensions.Contains(extension))
                 {
                     return new ResultDto()
@@ -38,7 +38,7 @@ namespace graduationProject.Services
                         Message = "image not found"
                     };
                 }
-                if (image.Length > maxAllowedSize)
+                if (Offer.Image.Length > maxAllowedSize)
                 {
                     return new ResultDto()
                     {
@@ -50,13 +50,18 @@ namespace graduationProject.Services
                 var filePath = Path.Combine(_uploadsPath, fileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    await image.CopyToAsync(fileStream);
+                    await Offer.Image.CopyToAsync(fileStream);
                 }
                 var offer = new offer
                 {
-                    PostId = postId,
-                    OfferContent = offerContent,
-                    Image = fileName
+                    PostId = Offer.postId,
+                    //OfferContent = offerContent,
+                    Image = fileName,
+                    Rrice = Offer.Price,
+                    ProfitRate = Offer.ProfitRate,
+                    NationalId = Offer.NationalId,
+                    Description = Offer.Description
+
                 };
                 _context.Offers.Add(offer);
                 await _context.SaveChangesAsync();
@@ -68,13 +73,14 @@ namespace graduationProject.Services
                 // offer.Image = fileName;
             }
             return new ResultDto()
-            { 
+            {
                 IsSuccess = false,
-                Message ="offer doesnot sent"
+                Message = "offer doesnot sent"
             };
-          
-            
-           
+
+
+
+
         }
     }
 }

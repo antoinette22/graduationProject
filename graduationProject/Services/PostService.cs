@@ -31,11 +31,12 @@ namespace graduationProject.Services
         public async Task<ReturnPostDto> CreatePost(AddPostDto post, string username)
         {
             var returnPost = new ReturnPostDto();
-            var user = await _userManager.FindByNameAsync(username);
+            // var user = await _userManager.FindByNameAsync(username);
+            var user = await _context.users.FindAsync(username);
             var Post = new Post
             {
                 Content = post.Content,
-                User = user
+                User = user,
             };
             if(post.Attachment != null)
             {
@@ -65,7 +66,7 @@ namespace graduationProject.Services
 
             returnPost.Id = Post.Id;
             returnPost.Content = Post.Content;
-            returnPost.UserName = user.UserName;
+            returnPost.UserName = user.Name;
             returnPost.isSucces = true;
             if (Post.Reacts != null)
             {
@@ -171,7 +172,7 @@ namespace graduationProject.Services
             {
                 Id = Post.Id,
                 Content = post.Content,
-                UserName = Post.User.UserName,
+                UserName = Post.User.Name,
                 isSucces = true,
                 
 
@@ -222,7 +223,7 @@ namespace graduationProject.Services
                 Id = Post.Id,
                 Content = Post.Content,
                 isSucces = true,
-                UserName = Post.User.UserName,
+                UserName = Post.User.Name,
             };
             if (Post.Reacts != null)
             {
@@ -253,7 +254,7 @@ namespace graduationProject.Services
         public async Task<List<ReturnPostDto>> GetPostsByUser(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
-            var Posts = await _context.Posts.Include("User").Include("Comments").Where(p => p.User == user).ToListAsync();
+            var Posts = await _context.Posts.Include("User").Include("Comments").Where(p => p.User == user.User).ToListAsync();
             var returnPosts = new List<ReturnPostDto>();
             foreach (var Post in Posts)
             {
@@ -265,7 +266,7 @@ namespace graduationProject.Services
                 {
                     Id = Post.Id,
                     Content = Post.Content,
-                    UserName = Post.User.UserName,
+                    UserName = Post.User.Name,
                     isSucces = true,
                 };
                 if (Post.Reacts != null)
@@ -439,7 +440,7 @@ namespace graduationProject.Services
                 Id = commentEntity.Id,
                 Content = commentEntity.Content,
                 PostId = commentEntity.Post.Id,
-                UserName = commentEntity.Post.User.UserName,
+                UserName = commentEntity.Post.User.Name,
                 isSucces = true,
             };
             if(commentEntity.Attachment != null)
@@ -488,7 +489,7 @@ namespace graduationProject.Services
                         Id = comment.Id,
                         Content = comment.Content,
                         PostId = comment.Post.Id,
-                        UserName = user.UserName,
+                        UserName = user.Name,
                         isSucces = true,
                     };
                     if (comment.Attachment != null)
@@ -565,7 +566,7 @@ namespace graduationProject.Services
                 Id = comment.Id,
                 Content = comment.Content,
                 PostId = comment.Post.Id,
-                UserName = comment.Post.User.UserName,
+                UserName = comment.Post.User.Name,
                 isSucces = true,
             };
             if(comment.Attachment != null)
@@ -723,7 +724,7 @@ namespace graduationProject.Services
             {
                 Id = replyEntity.Id,
                 Content = replyEntity.Content,
-                Username = replyEntity.Comment.Post.User.UserName,
+                Username = replyEntity.Comment.Post.User.Name,
                 CommentId = replyEntity.Comment.Id,
                 isSucces = true,
             };
@@ -775,7 +776,7 @@ namespace graduationProject.Services
                 {
                     Id = reply.Id,
                     Content = reply.Content,
-                    Username = reply.Comment.Post.User.UserName,
+                    Username = reply.Comment.Post.User.Name,
                     CommentId = reply.Comment.Id,
                     isSucces = true,
                 };
@@ -829,7 +830,7 @@ namespace graduationProject.Services
             {
                 Id = reply.Id,
                 Content = reply.Content,
-                Username = reply.Comment.Post.User.UserName,
+                Username = reply.Comment.Post.User.Name,
                 CommentId = reply.Comment.Id,
                 isSucces = true,
             };
