@@ -2,6 +2,7 @@
 using graduationProject.DTOs;
 using graduationProject.DTOs.offers;
 using graduationProject.Models;
+using Microsoft.Extensions.Hosting;
 
 namespace graduationProject.Services
 {
@@ -60,10 +61,19 @@ namespace graduationProject.Services
                     Rrice = Offer.Price,
                     ProfitRate = Offer.ProfitRate,
                     NationalId = Offer.NationalId,
-                    Description = Offer.Description
+                    Description = Offer.Description,
+                    //Pos.IsHaveOffer = true
 
                 };
+                var posttt = await _context.Posts.FindAsync(Offer.postId);
+
+                if (post != null)
+                {
+                    offer.Post = posttt;
+                    posttt.IsHaveOffer = true; 
+                }
                 _context.Offers.Add(offer);
+              //  _context.Offers.Add(offer);
                 await _context.SaveChangesAsync();
                 return new ResultDto()
                 {

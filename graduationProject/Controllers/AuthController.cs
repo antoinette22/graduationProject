@@ -392,11 +392,31 @@ namespace graduationProject.Controllers
         }
         //[Authorize]
         [HttpGet("serch users")]
-        
+
         public async Task<IActionResult> SearchUsers(string userName)
 
         {
             var result = await _userservice.SearchUserProfile(userName);
+            return Ok(result);
+        }
+
+        [HttpGet("GetOfferedPost")]
+
+        public async Task<IActionResult> GetOfferedPost(int id)
+
+        {
+            var result = await _userservice.getOfferedPosts(id);
+            if (result == null)
+                return BadRequest("Post not found");
+            return Ok(result);
+        }
+
+        [HttpDelete("RefusedOffer")]
+
+        public async Task<IActionResult> RefusedOffer(int id)
+
+        {
+            var result = await _userservice.RefuseOffer(id);            
             return Ok(result);
         }
 

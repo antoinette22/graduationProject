@@ -15,6 +15,7 @@ namespace graduationProject.Models
         public IEnumerable<offer> offers { get; set; }
         public int UserId { get; set; }
         public Users User { get; set; }
+        public bool IsHaveOffer { get; set; } = false;
 
     }
 }
